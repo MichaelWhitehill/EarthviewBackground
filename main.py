@@ -6,6 +6,7 @@ from image_library import Image_Library
 from earthview_scraper import earthview_scraper
 
 
+
 CONFIG_PATH = "config.yaml"
 
 EATHVIEW_DATA_PATH_KEY = "earthview_data_path"
@@ -51,9 +52,7 @@ class BackgroundManager():
 
     def change_background(self, monitorId: str, bg_path: str) -> None:
         # TODO Check status
-        subprocess.Popen([WALLPAPER_CHANGER_PATH, "set", monitorId, bg_path], stdout=subprocess.PIPE).communicate()[0]
-        
-
+        subprocess.Popen([WALLPAPER_CHANGER_PATH, "set", monitorId, bg_path], stdout=subprocess.PIPE).communicate()[0
 
 
 def main():
