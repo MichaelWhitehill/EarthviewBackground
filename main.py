@@ -1,4 +1,4 @@
-import os.path
+import os
 import json
 import yaml
 import subprocess
@@ -13,7 +13,7 @@ EATHVIEW_DATA_PATH_KEY = "earthview_data_path"
 EARTHVIEW_CONFIG_PATH_KEY = "earthview_config_path"
 MONITORS_KEY = "monitors"
 
-WALLPAPER_CHANGER_PATH = "C:/Users/micha/Projects/EarthviewBackground/wallpaper changer/bin/Debug/net7.0/DesktopWallpaperSample.exe"
+WALLPAPER_CHANGER_PATH = r"wallpaper_changer\bin\Release\net7.0\publish\DesktopWallpaperSample.exe"
 
 class BackgroundManager():
 
@@ -28,9 +28,10 @@ class BackgroundManager():
             earthview_scraper.print_locations_to_file(locations, self.config[EATHVIEW_DATA_PATH_KEY])
         else:
             print("Earthview data is present")
-        earthview_lib = Image_Library(self.config[EARTHVIEW_CONFIG_PATH_KEY], self.config[EATHVIEW_DATA_PATH_KEY])
+        self.earthview_lib = Image_Library(self.config[EARTHVIEW_CONFIG_PATH_KEY], self.config[EATHVIEW_DATA_PATH_KEY])
         for monitor in self.config[MONITORS_KEY]:
-            self.change_background(monitor, earthview_lib.next())
+            path = self.earthview_lib.next()
+            self.change_background(monitor, path)
     
     def load_config(self) -> None:
         config_file_handler = open(self.config_path)
@@ -42,7 +43,8 @@ class BackgroundManager():
     def save_config(self) -> None:
         os.remove(CONFIG_PATH)
         with open(CONFIG_PATH, 'w') as file:
-            documents = yaml.dump(self.config, file)
+            yaml.dump(self.config, file)
+        self.earthview_lib.save_config()
 
     def get_monitors(self) -> list[str]:
         output = subprocess.Popen([WALLPAPER_CHANGER_PATH, "monitors"], stdout=subprocess.PIPE).communicate()[0].decode()
@@ -52,7 +54,8 @@ class BackgroundManager():
 
     def change_background(self, monitorId: str, bg_path: str) -> None:
         # TODO Check status
-        subprocess.Popen([WALLPAPER_CHANGER_PATH, "set", monitorId, bg_path], stdout=subprocess.PIPE).communicate()[0
+        p = subprocess.Popen([WALLPAPER_CHANGER_PATH, "set", monitorId, bg_path], stdout=subprocess.PIPE)
+        status = p.wait()
 
 
 def main():
