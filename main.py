@@ -1,9 +1,10 @@
 import os
-import json
+import time
 import yaml
 import subprocess
 from image_library import Image_Library
 from earthview_scraper import earthview_scraper
+from wallpaper_changer.idesktop import IDesktopWallpaper
 
 
 
@@ -19,6 +20,7 @@ class BackgroundManager():
 
     def __init__(self) -> None:
         self.config_path = CONFIG_PATH
+        self.desktop = IDesktopWallpaper.CoCreateInstance()
         self.load_config()
 
         if not os.path.isfile(self.config[EATHVIEW_DATA_PATH_KEY]):
@@ -47,15 +49,16 @@ class BackgroundManager():
         self.earthview_lib.save_config()
 
     def get_monitors(self) -> list[str]:
-        output = subprocess.Popen([WALLPAPER_CHANGER_PATH, "monitors"], stdout=subprocess.PIPE).communicate()[0].decode()
-        output = output.strip("[]")
-        monitors = output.split(",")
+        mon_count = self.desktop.GetMonitorDevicePathCount()
+        monitors = []
+        for i in range(0, mon_count):
+            monitors.append(self.desktop.GetMonitorDevicePathAt(i))
         return monitors
 
     def change_background(self, monitorId: str, bg_path: str) -> None:
-        # TODO Check status
-        p = subprocess.Popen([WALLPAPER_CHANGER_PATH, "set", monitorId, bg_path], stdout=subprocess.PIPE)
-        status = p.wait()
+        self.desktop.SetWallpaper(monitorId=monitorId, wallpaper=bg_path)
+        time.sleep(1.5)
+        
 
 
 def main():
