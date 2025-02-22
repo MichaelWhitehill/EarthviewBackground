@@ -33,7 +33,7 @@ class ImageLibrary():
 
     def download_image(self, index: int) -> str:
         img_bytes = requests.get(self.image_data[index]["photoUrl"]).content
-        img_name = self.image_data[index]["name"].strip()+".jpg"
+        img_name = self.image_data[index]["name"].strip()+str(index)+".jpg"
         img_path = os.path.join(self.download_path, img_name)
         if not os.path.exists(self.download_path):
             os.makedirs(self.download_path)
