@@ -21,6 +21,8 @@ class Monitor():
         time.sleep(2)
     
     def set_current_bg(self):
+        """This function only exists to fight strange background behavior on Windows.
+        For example, create 2 desktop instances then change the background"""
         desktop.set_background(self.id, self.current_background)
         time.sleep(2)
 
