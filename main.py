@@ -1,5 +1,6 @@
 import os
 import time
+from pathlib import Path
 import pickle
 import argparse
 from image_libraries.image_library import ImageLibrary
@@ -17,7 +18,6 @@ class Monitor():
     def next_bg(self):
         self.current_background =  self.earthview_lib.next()
         desktop.set_background(self.id, self.current_background)
-        print(f"mon: {self.id} bg: {self.current_background}")
         time.sleep(2)
     
     def set_current_bg(self):
@@ -54,17 +54,17 @@ def main():
 
     if os.path.isfile(os.path.join(os.getenv("LOCALAPPDATA"), "bg_changer", "state.pkl")):
         bm = pickle.load(open(os.path.join(os.getenv("LOCALAPPDATA"), "bg_changer", "state.pkl"), "rb"))
-        for m in bm.monitors:
-            print(m.__dict__)
     else:
         bm = BackgroundManager()
 
-    if args.cycle:
-        bm.cycle_monitors()
     if args.set_current:
         bm.set_current_background()
-        
-    with open(os.path.join(os.getenv("LOCALAPPDATA"), "bg_changer", "state.pkl"), "wb") as f:
+    else:
+        bm.cycle_monitors()
+
+    pickle_path = os.path.join(os.getenv("LOCALAPPDATA"), "bg_changer", "state.pkl")
+    Path(os.path.dirname(pickle_path)).mkdir(parents=True, exist_ok=True)
+    with open(pickle_path, "wb") as f:
         for m in bm.monitors:
             print(m.__dict__)
         pickle.dump(bm, f)

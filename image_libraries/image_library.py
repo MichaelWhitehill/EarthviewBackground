@@ -1,18 +1,21 @@
 import json
 import requests
 import os
+from pathlib import Path
 from earthview_scraper import earthview_scraper
-import shutil
 
-LIB_PATH_KEY = "library_path"
-NEXT_IMAGE_KEY = "earthview_image"
-LOCAL_IMAGES_KEY = "local_paths"
-LIB_DATA_PATH_KEY = "lib_data_path"
-DOWNLOAD_PATH_KEY = "download_path"
+EARTHVIEW_DATA_URL = "https://raw.githubusercontent.com/MichaelWhitehill/EarthviewBackground/master/earthview_scraper/earthview_data.json"
+
 class ImageLibrary():
     def __init__(self, start_image:int = 0) -> None:
         self.download_path = os.path.join(os.getenv("LOCALAPPDATA"), "bg_changer", "earthview_lib", "downloads")
         self.lib_data_path = os.path.join(os.getenv("LOCALAPPDATA"), "bg_changer", "earthview_lib", "data.json")
+        if not os.path.exists(self.lib_data_path):
+            response = requests.get(EARTHVIEW_DATA_URL)
+            assert response.status_code == 200
+            Path(os.path.dirname(self.lib_data_path)).mkdir(parents=True, exist_ok=True)
+            with open(self.lib_data_path, "w") as file:
+                json.dump(response.json(), file, indent=4)
         with open(self.lib_data_path, encoding="utf-8") as image_data_handler:
             self.image_data = json.load(image_data_handler)
         self.next_image = start_image
