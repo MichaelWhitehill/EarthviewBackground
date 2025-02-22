@@ -5,7 +5,7 @@ from earthview_scraper import earthview_scraper
 import shutil
 
 LIB_PATH_KEY = "library_path"
-NEXT_IMAGE_POINTER_KEY = "earthview_pointer"
+NEXT_IMAGE_KEY = "earthview_image"
 LOCAL_IMAGES_KEY = "local_paths"
 LIB_DATA_PATH_KEY = "lib_data_path"
 DOWNLOAD_PATH_KEY = "download_path"
@@ -25,8 +25,8 @@ class ImageLibrary():
             self.config[DOWNLOAD_PATH_KEY] = os.path.join(self.config[LIB_PATH_KEY], "downloads")
         if None is self.config.get(LIB_DATA_PATH_KEY, None):
             self.config[LIB_DATA_PATH_KEY] = os.path.join(self.config[LIB_PATH_KEY], "data.json")
-        if None is self.config.get(NEXT_IMAGE_POINTER_KEY, None):
-            self.config[NEXT_IMAGE_POINTER_KEY] = 0
+        if None is self.config.get(NEXT_IMAGE_KEY, None):
+            self.config[NEXT_IMAGE_KEY] = 0
         # check that paths and files exist
         if not os.path.isdir(self.config[LIB_PATH_KEY]):
             os.mkdir(self.config[LIB_PATH_KEY])
@@ -51,15 +51,16 @@ class ImageLibrary():
         # download next image
         # remove current image
         # return local image path
-        self.download_image(self.config[NEXT_IMAGE_POINTER_KEY])
-        bg = self.image_data[self.config[NEXT_IMAGE_POINTER_KEY]]
-        self.config[NEXT_IMAGE_POINTER_KEY] += 1
+        # os.remove(self.image_data[])
+        self.download_image(self.config[NEXT_IMAGE_KEY])
+        bg = self.image_data[self.config[NEXT_IMAGE_KEY]]
+        self.config[NEXT_IMAGE_KEY] += 1
         return bg["local_path"]
 
     def cleanup(self) -> str:
-        prev_image = self.config[NEXT_IMAGE_POINTER_KEY]
+        prev_image = self.config[NEXT_IMAGE_KEY]
 
-    def download_image(self, index: int):
+    def download_image(self, index: int) -> str:
         img_bytes = requests.get(self.image_data[index]["photoUrl"]).content
         img_name = self.image_data[index]["name"].strip()+".jpg"
         img_path = os.path.join(self.download_path, img_name)
